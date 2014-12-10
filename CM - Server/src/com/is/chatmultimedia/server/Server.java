@@ -1,30 +1,43 @@
 package com.is.chatmultimedia.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Map;
+
+import com.is.chatmultimedia.models.ServerMessage;
+import com.is.chatmultimedia.server.services.AuthenticationService;
+import com.is.chatmultimedia.server.services.ConversationService;
 
 public class Server {
 
 	private ServerSocket serverSocket;
-	private List<Socket> temporaryConnections;
-	private Map<String, Socket> connections;
-	private int port;
+	private List<Socket> connections;
 	private volatile boolean stopped = false;
 
-	public Server(int port) {
-		this.port = port;
-		temporaryConnections = new ArrayList<>();
-		connections = new HashMap<>();
+	// server services
+	private AuthenticationService authenticationService;
+	private ConversationService conversationService;
+
+	private static Server instance;
+	private static final int PORT = 8888;
+
+	public static Server getInstance() {
+		if (instance == null) {
+			instance = new Server();
+		}
+		return instance;
+	}
+
+	private Server() {
+		connections = new ArrayList<>();
+		authenticationService = AuthenticationService.getInstance();
+		conversationService = ConversationService.getInstance();
 	}
 
 	public void start() {
-		Server server = this;
 		new Runnable() {
 
 			@Override
@@ -32,16 +45,16 @@ public class Server {
 				Socket clientSocket;
 
 				try {
-					serverSocket = new ServerSocket(port);
+					serverSocket = new ServerSocket(PORT);
 					serverSocket.setSoTimeout(1000);
 
 					while (!stopped) {
 						try {
 							clientSocket = serverSocket.accept();
 							ClientThread clientThread = ClientThread
-									.getInstance(clientSocket, server);
+									.getInstance(clientSocket);
 							clientThread.start();
-							addTemporaryConnection(clientSocket);
+							addConnection(clientSocket);
 						} catch (SocketTimeoutException timeOutException) {
 							if (stopped) {
 								break;
@@ -64,13 +77,24 @@ public class Server {
 		stopped = true;
 	}
 
-	private synchronized boolean addTemporaryConnection(Socket clientSocket) {
-		return temporaryConnections.add(clientSocket);
+	public boolean processMessage(ServerMessage message, Socket sourceConnection) {
+		switch (message.getMessageType()) {
+		case REGISTER:
+			return false;
+		case LOGIN:
+		case LOGOUT:
+			return authenticationService.serverRequest(message,
+					sourceConnection);
+		case CONVERSATION:
+			return conversationService.serverRequest(message);
+		case CLOSE_CONNECTION:
+			return false;
+		}
+		return false;
 	}
 
-	private synchronized void changeTemporaryToGenuineConnection(
-			Socket clientSocket, String username) {
-		temporaryConnections.remove(clientSocket);
-		connections.put(username, clientSocket);
+	private synchronized boolean addConnection(Socket connection) {
+		return connections.add(connection);
 	}
+
 }

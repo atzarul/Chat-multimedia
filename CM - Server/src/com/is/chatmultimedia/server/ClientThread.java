@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
-import com.is.chatmultimedia.models.ChatMessage;
+import com.is.chatmultimedia.models.ServerMessage;
 
 public class ClientThread extends Thread {
 
-	private Server server;
 	private Socket clientSocket;
 	private ObjectInputStream input;
-	private String username;
 
-	public static ClientThread getInstance(Socket clientSocket, Server server)
+	public static ClientThread getInstance(Socket clientSocket)
 			throws IOException {
-		ClientThread clientThread = new ClientThread(clientSocket, server);
+		ClientThread clientThread = new ClientThread(clientSocket);
 		clientThread.setInputStream(new ObjectInputStream(clientSocket
 				.getInputStream()));
 		return clientThread;
@@ -25,24 +23,17 @@ public class ClientThread extends Thread {
 	public void run() {
 		while (clientSocket.isConnected()) {
 			try {
-				ChatMessage message = (ChatMessage) input.readObject();
-				switch (message.getMessageType()) {
-				case LOGIN:
-					break;
-				case LOGOUT:
-					break;
-				case MESSAGE:
-					break;
-				}
+				ServerMessage serverMessage = (ServerMessage) input
+						.readObject();
+				Server.getInstance().processMessage(serverMessage, clientSocket);
 			} catch (Exception e) {
 				// message failed
 			}
 		}
 	}
 
-	private ClientThread(Socket clientSocket, Server server) {
+	private ClientThread(Socket clientSocket) {
 		this.clientSocket = clientSocket;
-		this.server = server;
 	}
 
 	private void setInputStream(ObjectInputStream input) {
