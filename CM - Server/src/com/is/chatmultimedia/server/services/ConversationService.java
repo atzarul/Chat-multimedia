@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import com.is.chatmultimedia.models.ConversationMessage;
+import com.is.chatmultimedia.models.ClientConversationMessage;
+import com.is.chatmultimedia.models.ServerConversationMessage;
 import com.is.chatmultimedia.models.ServerMessage;
 import com.is.chatmultimedia.models.ServerMessage.ServerMessageType;
 import com.is.chatmultimedia.server.models.User;
@@ -29,14 +30,17 @@ public class ConversationService {
 		if (message.getMessageType() != ServerMessageType.CONVERSATION) {
 			return false;
 		}
-		ConversationMessage conversationMessage = (ConversationMessage) message;
+		ServerConversationMessage conversationMessage = (ServerConversationMessage) message;
 		User targetUser = userManager.getUserByUsername(conversationMessage
 				.getTargetUser());
 		Socket targetConnection = targetUser.getConnection();
 		try {
 			ObjectOutputStream output = new ObjectOutputStream(
 					targetConnection.getOutputStream());
-			output.writeObject(message);
+			ClientConversationMessage messageForClient = new ClientConversationMessage(
+					conversationMessage);
+			output.writeObject(messageForClient);
+			output.flush();
 		} catch (IOException e) {
 			return false;
 		}

@@ -2,6 +2,7 @@ package com.is.chatmultimedia.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import com.is.chatmultimedia.models.ServerMessage;
@@ -14,6 +15,10 @@ public class ClientThread extends Thread {
 	public static ClientThread getInstance(Socket clientSocket)
 			throws IOException {
 		ClientThread clientThread = new ClientThread(clientSocket);
+		
+		ObjectOutputStream temp = new ObjectOutputStream(clientSocket.getOutputStream());
+		temp.flush();
+		
 		clientThread.setInputStream(new ObjectInputStream(clientSocket
 				.getInputStream()));
 		return clientThread;

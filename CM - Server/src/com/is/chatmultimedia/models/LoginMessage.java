@@ -4,6 +4,7 @@ public class LoginMessage extends ServerMessage {
 	
 	private String username;
 	private String password;
+	private static final long serialVersionUID = 1;
 	
 	public LoginMessage(String username, String password) {
 		super(ServerMessageType.LOGIN);

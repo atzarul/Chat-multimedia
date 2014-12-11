@@ -1,12 +1,13 @@
 package com.is.chatmultimedia.models;
 
-public class ConversationMessage extends ServerMessage {
+public class ServerConversationMessage extends ServerMessage {
 
 	private String sourceUser;
 	private String targetUser;
 	private String messageToSend;
+	private static final long serialVersionUID = 1;
 
-	public ConversationMessage(String soruceUser, String targetUser,
+	public ServerConversationMessage(String soruceUser, String targetUser,
 			String messageToSend) {
 		super(ServerMessageType.CONVERSATION);
 		this.sourceUser = soruceUser;

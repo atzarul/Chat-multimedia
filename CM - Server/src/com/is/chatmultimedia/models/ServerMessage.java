@@ -1,6 +1,10 @@
 package com.is.chatmultimedia.models;
 
-public abstract class ServerMessage {
+import java.io.Serializable;
+
+public abstract class ServerMessage implements Serializable {
+	
+	private static final long serialVersionUID = 1;
 	
 	public enum ServerMessageType {
 		REGISTER, LOGIN, LOGOUT, CONVERSATION, CLOSE_CONNECTION
