@@ -6,43 +6,38 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import com.is.chatmultimedia.models.ServerMessage;
+import com.is.chatmultimedia.server.models.Connection;
 
 public class ClientThread extends Thread {
 
-	private Socket clientSocket;
-	private ObjectInputStream input;
+  private Connection connection;
 
-	public static ClientThread getInstance(Socket clientSocket)
-			throws IOException {
-		ClientThread clientThread = new ClientThread(clientSocket);
-		
-		ObjectOutputStream temp = new ObjectOutputStream(clientSocket.getOutputStream());
-		temp.flush();
-		
-		clientThread.setInputStream(new ObjectInputStream(clientSocket
-				.getInputStream()));
-		return clientThread;
-	}
+  public static ClientThread getInstance(Socket clientSocket) throws IOException {
 
-	@Override
-	public void run() {
-		while (clientSocket.isConnected()) {
-			try {
-				ServerMessage serverMessage = (ServerMessage) input
-						.readObject();
-				Server.getInstance().processMessage(serverMessage, clientSocket);
-			} catch (Exception e) {
-				// message failed
-			}
-		}
-	}
+    ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+    outputStream.flush();
+    ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
+    ClientThread clientThread = new ClientThread(clientSocket, inputStream, outputStream);
+    return clientThread;
+  }
 
-	private ClientThread(Socket clientSocket) {
-		this.clientSocket = clientSocket;
-	}
+  @Override
+  public void run() {
+    Socket clientSocket = connection.getSocket();
+    ObjectInputStream input = connection.getInputStream();
+    while (clientSocket.isConnected()) {
+      try {
+        ServerMessage serverMessage = (ServerMessage) input.readObject();
+        Server.getInstance().processMessage(serverMessage, connection);
+      }
+      catch (Exception e) {
+        // message failed
+      }
+    }
+  }
 
-	private void setInputStream(ObjectInputStream input) {
-		this.input = input;
-	}
+  private ClientThread(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream) {
+    this.connection = new Connection(clientSocket, inputStream, outputStream);
+  }
 
 }
