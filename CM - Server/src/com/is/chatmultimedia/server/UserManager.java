@@ -1,4 +1,4 @@
-package com.is.chatmultimedia.server.services;
+package com.is.chatmultimedia.server;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,10 @@ public class UserManager {
 
   public void addUser(User user) {
     users.put(user.getUsername(), user);
+  }
+
+  public User removeUser(User user) {
+    return users.remove(user.getClass());
   }
 
   public User getUserByUsername(String username) {

@@ -7,6 +7,7 @@ import com.is.chatmultimedia.models.ClientConversationMessage;
 import com.is.chatmultimedia.models.ServerConversationMessage;
 import com.is.chatmultimedia.models.ServerMessage;
 import com.is.chatmultimedia.models.ServerMessage.ServerMessageType;
+import com.is.chatmultimedia.server.UserManager;
 import com.is.chatmultimedia.server.models.User;
 import com.is.chatmultimedia.server.models.Connection;
 

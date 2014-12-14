@@ -13,7 +13,6 @@ public class ClientThread extends Thread {
   private Connection connection;
 
   public static ClientThread getInstance(Socket clientSocket) throws IOException {
-
     ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
     outputStream.flush();
     ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
@@ -25,7 +24,7 @@ public class ClientThread extends Thread {
   public void run() {
     Socket clientSocket = connection.getSocket();
     ObjectInputStream input = connection.getInputStream();
-    while (clientSocket.isConnected()) {
+    while (!clientSocket.isClosed()) {
       try {
         ServerMessage serverMessage = (ServerMessage) input.readObject();
         Server.getInstance().processMessage(serverMessage, connection);
@@ -34,6 +33,10 @@ public class ClientThread extends Thread {
         // message failed
       }
     }
+  }
+
+  public Connection getThreadsConnection() {
+    return this.connection;
   }
 
   private ClientThread(Socket clientSocket, ObjectInputStream inputStream, ObjectOutputStream outputStream) {

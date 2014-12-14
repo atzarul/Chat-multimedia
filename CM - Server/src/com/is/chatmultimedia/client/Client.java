@@ -140,9 +140,7 @@ public class Client {
       break;
     case LOGIN_RESPONSE:
       LoginResponseMessage loginResponse = (LoginResponseMessage) message;
-      // TEMPORAR
-      messageListener.displayMessage("Server", "Logged in successful: " + loginResponse.isSuccessful() + ". "
-          + loginResponse.getMessage());
+      messageListener.displayMessage("Server", loginResponse.getMessage());
       break;
     }
   }

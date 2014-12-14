@@ -1,6 +1,5 @@
 package com.is.chatmultimedia.server.models;
 
-
 public class User {
 
   private String username;
