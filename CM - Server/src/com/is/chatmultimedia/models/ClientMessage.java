@@ -8,7 +8,7 @@ public abstract class ClientMessage implements Serializable {
   private static final long serialVersionUID = 1;
 
   public enum ClientMessageType {
-    REGISTER_RESPONSE, LOGIN_RESPONSE, CONVERSATION, SERVER_STOPPED
+    REGISTER_RESPONSE, LOGIN_RESPONSE, CONVERSATION, USER_CAME_ONLINE, USER_WENT_OFFLINE, SERVER_STOPPED
   }
 
   public ClientMessage(ClientMessageType messageType) {

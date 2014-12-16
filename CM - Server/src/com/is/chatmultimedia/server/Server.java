@@ -13,6 +13,7 @@ import com.is.chatmultimedia.models.ServerStoppedMessage;
 import com.is.chatmultimedia.server.models.Connection;
 import com.is.chatmultimedia.server.services.AuthenticationService;
 import com.is.chatmultimedia.server.services.ConversationService;
+import com.is.chatmultimedia.server.services.RegisterService;
 
 public class Server {
 
@@ -24,6 +25,7 @@ public class Server {
   // server services
   private AuthenticationService authenticationService;
   private ConversationService conversationService;
+  private RegisterService registerService;
 
   private static Server instance;
   private static final int PORT = 8888;
@@ -44,6 +46,7 @@ public class Server {
     connections = new ArrayList<>();
     authenticationService = AuthenticationService.getInstance();
     conversationService = ConversationService.getInstance();
+    registerService = RegisterService.getInstance();
   }
 
   /**
@@ -108,12 +111,12 @@ public class Server {
   public boolean processMessage(ServerMessage message, Connection sourceConnection) {
     switch (message.getMessageType()) {
     case REGISTER:
-      return false;
+      return registerService.serveRequest(message, sourceConnection);
     case LOGIN:
     case LOGOUT:
-      return authenticationService.serverRequest(message, sourceConnection);
+      return authenticationService.serveRequest(message, sourceConnection);
     case CONVERSATION:
-      return conversationService.serverRequest(message);
+      return conversationService.serveRequest(message);
     case CLOSE_CONNECTION:
       return removeConnecion(sourceConnection);
     }

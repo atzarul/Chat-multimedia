@@ -2,16 +2,16 @@ package com.is.chatmultimedia.models;
 
 public class LogoutMessage extends ServerMessage {
 
-  private String username;
+  private User user;
   private static final long serialVersionUID = 1;
 
-  public LogoutMessage(String username) {
+  public LogoutMessage(User user) {
     super(ServerMessageType.LOGOUT);
-    this.username = username;
+    this.user = user;
   }
 
-  public String getUsername() {
-    return this.username;
+  public User getUser() {
+    return this.user;
   }
 
 }

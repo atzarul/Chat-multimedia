@@ -1,17 +1,15 @@
 package com.is.chatmultimedia.models;
 
-public class LoginResponseMessage extends ClientMessage {
+public class RegisterResponseMessage extends ClientMessage {
 
   private boolean successful;
   private String message;
-  private User userData;
   private static final long serialVersionUID = 1;
 
-  public LoginResponseMessage(boolean successful, String message, User userData) {
-    super(ClientMessageType.LOGIN_RESPONSE);
+  public RegisterResponseMessage(boolean successful, String message) {
+    super(ClientMessageType.REGISTER_RESPONSE);
     this.successful = successful;
     this.message = message;
-    this.userData = userData;
   }
 
   public boolean isSuccessful() {
@@ -20,10 +18,6 @@ public class LoginResponseMessage extends ClientMessage {
 
   public String getMessage() {
     return this.message;
-  }
-
-  public User getUserData() {
-    return this.userData;
   }
 
 }

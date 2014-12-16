@@ -10,8 +10,7 @@ public class TestClient implements Client.MessageListener {
     client.registerMessageListener(test);
     client.run();
 
-    client.login("anamaria", "buba");
-    client.login("atzaruri", " password");
+    client.login("atzaruri", "password");
     client.login("atzaruri", "password");
   }
 

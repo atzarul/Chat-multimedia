@@ -1,12 +1,14 @@
-package com.is.chatmultimedia.client.models;
+package com.is.chatmultimedia.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 
   private String username;
   private String name;
   private List<Friend> friends;
+  private static final long serialVersionUID = 1;
 
   public User(String username, String name, List<Friend> friends) {
     this.username = username;

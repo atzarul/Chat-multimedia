@@ -27,7 +27,7 @@ public class ConversationService {
     return instance;
   }
 
-  public boolean serverRequest(ServerMessage message) {
+  public boolean serveRequest(ServerMessage message) {
     if (message.getMessageType() != ServerMessageType.CONVERSATION) {
       return false;
     }

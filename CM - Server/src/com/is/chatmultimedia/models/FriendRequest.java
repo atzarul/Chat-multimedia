@@ -1,10 +1,13 @@
-package com.is.chatmultimedia.server.database;
+package com.is.chatmultimedia.models;
 
-public class FriendRequest {
+import java.io.Serializable;
+
+public class FriendRequest implements Serializable {
 
   private String fromUsername;
   private String fromName;
   private String toUsername;
+  private static final long serialVersionUID = 1;
 
   public FriendRequest(String fromUsername, String fromName, String toUsername) {
     this.fromUsername = fromUsername;
