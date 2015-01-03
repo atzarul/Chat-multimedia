@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import com.is.chatmultimedia.models.Friend;
 import com.is.chatmultimedia.models.FriendRequest;
@@ -50,12 +51,12 @@ public class DatabaseOperations {
       statement.executeQuery(query);
 
       ResultSet results = statement.getResultSet();
-      ArrayList<Friend> listOfFriends = new ArrayList<>();
+      TreeMap<String, Friend> listOfFriends = new TreeMap<String, Friend>();
       String friendUsername, friendName;
       while (results.next()) {
         friendUsername = results.getString(1);
         friendName = results.getString(2);
-        listOfFriends.add(new Friend(friendUsername, friendName));
+        listOfFriends.put(friendUsername, new Friend(friendName, friendUsername));
       }
       return new User(username, user.getName(), listOfFriends);
     }

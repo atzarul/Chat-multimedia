@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.is.chatmultimedia.models.ClientMessage;
@@ -108,8 +109,8 @@ public class AuthenticationService {
 
   private List<User> getOnlineFriendsForUser(com.is.chatmultimedia.models.User user) {
     List<User> onlineFriends = new ArrayList<User>();
-    List<Friend> allFriends = user.getFriends();
-    User aUser;
+    Collection<Friend> allFriends = user.getFriends().values();
+    User aUser = null;
     for (Friend it : allFriends) {
       aUser = userManager.getUserByUsername(it.getUsername());
       if (aUser != null) { // user is online
@@ -149,16 +150,18 @@ public class AuthenticationService {
       @Override
       public void run() {
         ObjectOutputStream output;
-        List<Friend> friends = user.getFriends();
+        Collection<Friend> friends = user.getFriends().values();
         User serverUser;
         UserWentOfflineMessage message = new UserWentOfflineMessage(user.getUsername());
         for (Friend it : friends) {
           try {
-            serverUser = userManager.getUserByUsername(it.getUsername());
-            if (serverUser != null) { // friend is online, notify him
-              output = serverUser.getConnection().getOutputStream();
-              output.writeObject(message);
-              output.flush();
+            if (it.isOnline()) {
+              serverUser = userManager.getUserByUsername(it.getUsername());
+              if (serverUser != null) { // friend is online, notify him
+                output = serverUser.getConnection().getOutputStream();
+                output.writeObject(message);
+                output.flush();
+              }
             }
           }
           catch (IOException e) {

@@ -1,7 +1,7 @@
 package com.is.chatmultimedia.server;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.is.chatmultimedia.server.models.User;
 
@@ -11,7 +11,7 @@ public class UserManager {
   private static UserManager instance;
 
   private UserManager() {
-    users = new HashMap<String, User>();
+    users = new ConcurrentHashMap<>();
   }
 
   public static UserManager getInstance() {
@@ -26,7 +26,7 @@ public class UserManager {
   }
 
   public User removeUser(User user) {
-    return users.remove(user.getClass());
+    return users.remove(user.getUsername());
   }
 
   public User getUserByUsername(String username) {

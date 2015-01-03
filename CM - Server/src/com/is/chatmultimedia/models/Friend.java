@@ -2,7 +2,7 @@ package com.is.chatmultimedia.models;
 
 import java.io.Serializable;
 
-public class Friend implements Serializable {
+public class Friend implements Serializable, Comparable<Friend> {
 
   private String name;
   private String username;
@@ -35,4 +35,7 @@ public class Friend implements Serializable {
     return this.isOnline;
   }
 
+  public int compareTo(Friend anotherFriend) {
+    return username.compareTo(anotherFriend.getUsername());
+  }
 }

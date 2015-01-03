@@ -1,16 +1,16 @@
 package com.is.chatmultimedia.models;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.TreeMap;
 
 public class User implements Serializable {
 
   private String username;
   private String name;
-  private List<Friend> friends;
+  private TreeMap<String, Friend> friends;
   private static final long serialVersionUID = 1;
 
-  public User(String username, String name, List<Friend> friends) {
+  public User(String username, String name, TreeMap<String, Friend> friends) {
     this.username = username;
     this.name = name;
     this.friends = friends;
@@ -24,8 +24,12 @@ public class User implements Serializable {
     return name;
   }
 
-  public List<Friend> getFriends() {
+  public TreeMap<String, Friend> getFriends() {
     return friends;
+  }
+
+  public Friend getFriendByUsername(String username) {
+    return friends.get(username);
   }
 
 }
