@@ -62,7 +62,7 @@ public class AuthenticationService {
       }
       else {
         String correctPassword = userRecord.getPassword();
-        String inputPassword = loginMessage.getPassword();
+        String inputPassword = new String(loginMessage.getPassword());
         if (correctPassword.compareTo(inputPassword) != 0) { // incorrect password
           responseMessage = new LoginResponseMessage(false, INCORRECT_PASSWORD, null);
         }
@@ -71,11 +71,14 @@ public class AuthenticationService {
           List<User> onlineFriends = getOnlineFriendsForUser(userData);
           responseMessage = new LoginResponseMessage(true, LOGIN_SUCCESSFUL, userData);
           notifyFriendsThatUserCameOnline(loginMessage.getUsername(), onlineFriends);
+          // save user as logged in
+          User user = new User(loginMessage.getUsername(), userConnection);
+          userManager.addUser(user);
+          // TEST MESSAGE
+          System.out.println("User - " + user.getUsername() + " - logged in! Logged in users ("
+              + userManager.getNumberOfUsers() + "): " + userManager.getListOfUsers());
         }
       }
-      // save user ass logged in
-      User user = new User(loginMessage.getUsername(), userConnection);
-      userManager.addUser(user);
       // write response to user
       writeResponse(responseMessage, userConnection);
       return true;
@@ -90,6 +93,9 @@ public class AuthenticationService {
     User targetUser = userManager.getUserByUsername(logoutMessage.getUser().getUsername());
     if (targetUser != null) {
       userManager.removeUser(targetUser);
+      // TEST MESSAGE
+      System.out.println("User - " + targetUser.getUsername() + " - logged out! Logged in users ("
+          + userManager.getNumberOfUsers() + "): " + userManager.getListOfUsers());
       notifyFriendsThatUserWentOffline(logoutMessage.getUser());
       return true;
     }
@@ -109,7 +115,7 @@ public class AuthenticationService {
 
   private List<User> getOnlineFriendsForUser(com.is.chatmultimedia.models.User user) {
     List<User> onlineFriends = new ArrayList<User>();
-    Collection<Friend> allFriends = user.getFriends().values();
+    Collection<Friend> allFriends = user.getFriends();
     User aUser = null;
     for (Friend it : allFriends) {
       aUser = userManager.getUserByUsername(it.getUsername());
@@ -150,7 +156,7 @@ public class AuthenticationService {
       @Override
       public void run() {
         ObjectOutputStream output;
-        Collection<Friend> friends = user.getFriends().values();
+        Collection<Friend> friends = user.getFriends();
         User serverUser;
         UserWentOfflineMessage message = new UserWentOfflineMessage(user.getUsername());
         for (Friend it : friends) {

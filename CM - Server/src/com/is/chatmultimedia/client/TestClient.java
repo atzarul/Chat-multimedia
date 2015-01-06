@@ -24,13 +24,13 @@ public class TestClient implements MessageListener, AuthenticationListener, Frie
     int arg = Integer.parseInt(args[0]);
     switch (arg) {
     case 0:
-      client.login("atzaruri", "password");
+      // client.login("atzaruri", "password");
       break;
     case 1:
-      client.login("oana.todea", "password");
+      // client.login("oana.todea", "password");
       break;
     case 2:
-      client.login("butiri", "password");
+      // client.login("butiri", "password");
       break;
     }
 
@@ -82,11 +82,6 @@ public class TestClient implements MessageListener, AuthenticationListener, Frie
   @Override
   public void loginFailed(String message) {
     System.out.println("Server> " + message);
-  }
-
-  @Override
-  public void logout(String message) {
-    System.out.println(message);
   }
 
 }

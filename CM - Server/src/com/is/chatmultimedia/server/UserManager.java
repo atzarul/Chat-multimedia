@@ -1,5 +1,7 @@
 package com.is.chatmultimedia.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,6 +33,18 @@ public class UserManager {
 
   public User getUserByUsername(String username) {
     return users.get(username);
+  }
+
+  public int getNumberOfUsers() {
+    return users.size();
+  }
+
+  public List<String> getListOfUsers() {
+    ArrayList<String> list = new ArrayList<String>();
+    for (String it : users.keySet()) {
+      list.add(it);
+    }
+    return list;
   }
 
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -63,7 +65,7 @@ public class Server {
           Socket clientSocket;
           try {
             serverSocket = new ServerSocket(PORT);
-            serverSocket.setSoTimeout(1000);
+            serverSocket.setSoTimeout(2000);
 
             while (!stopped) {
               try {
@@ -71,6 +73,8 @@ public class Server {
                 ClientThread clientThread = ClientThread.getInstance(clientSocket);
                 clientThread.start();
                 addConnection(clientThread.getThreadsConnection());
+                // TEST MESSAGE
+                System.out.println("New connection established. Connected users: " + connections.size());
               }
               catch (SocketTimeoutException timeOutException) {
                 if (stopped) {
@@ -143,7 +147,10 @@ public class Server {
         return false;
       }
     }
-    return connections.remove(connection);
+    boolean toReturn = connections.remove(connection);
+    // TEST MESSAGE
+    System.out.println("Connection stopped!. Connected users: " + connections.size());
+    return toReturn;
   }
 
   /*

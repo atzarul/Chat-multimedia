@@ -41,7 +41,7 @@ public class Client {
   private FriendsManagerListener friendsManagerListener;
   private ServerMessageListener serverMessageListener;
 
-  private static final String HOST_NAME = "localhost";
+  private static final String HOST_NAME = "188.24.101.175";
   private static final int HOST_PORT = 8888;
 
   public Client() {
@@ -102,7 +102,7 @@ public class Client {
     return this.loggedInUser;
   }
 
-  public boolean login(String username, String password) {
+  public boolean login(String username, char[] password) {
     if (!isAuthorized) {
       LoginMessage loginMessage = new LoginMessage(username, password);
       sendMessageToServer(loginMessage);

@@ -8,6 +8,4 @@ public interface AuthenticationListener {
 
   public void loginFailed(String message);
 
-  public void logout(String message);
-
 }

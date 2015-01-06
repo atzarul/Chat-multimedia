@@ -1,6 +1,7 @@
 package com.is.chatmultimedia.models;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.TreeMap;
 
 public class User implements Serializable {
@@ -24,8 +25,8 @@ public class User implements Serializable {
     return name;
   }
 
-  public TreeMap<String, Friend> getFriends() {
-    return friends;
+  public Collection<Friend> getFriends() {
+    return friends.values();
   }
 
   public Friend getFriendByUsername(String username) {
