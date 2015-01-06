@@ -37,7 +37,9 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
 
   private JMenuBar menuBar = new JMenuBar();
   private JMenu menu = new JMenu("Menu");
+  private JMenuItem addFriendItem = new JMenuItem("Add friend");
   private JMenuItem logOutMenuItem = new JMenuItem("Log out");
+  private JMenuItem exitItem = new JMenuItem("Exit");
   private JLabel onlineFriendsLabel = new JLabel();
   private JList<String> friendsList = new JList<String>();
   private FriendsListModel friendsListModel;
@@ -55,11 +57,16 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
   public FriendsPanel(Collection<Friend> friends) {
     this.setLayout(friendsLayout);
 
+    menu.add(addFriendItem);
+    menu.addSeparator();
     menu.add(logOutMenuItem);
+    menu.addSeparator();
+    menu.add(exitItem);
     menuBar.add(menu);
 
     layoutConstraints.gridx = 0;
     layoutConstraints.gridy = 0;
+    layoutConstraints.weightx = 1;
     layoutConstraints.gridwidth = 4;
     layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
     layoutConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -70,22 +77,18 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     onlineFriendsLabel.setText(ONLINE_FRIENDS);
     this.add(onlineFriendsLabel, layoutConstraints);
 
-    layoutConstraints.gridx = 0;
-    layoutConstraints.gridy = 2;
-    this.add(friendsList, layoutConstraints);
+    setListOfFriends(friends);
+    redisplayListOfFriends();
+
+    friendsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    friendsList.setLayoutOrientation(JList.VERTICAL);
+    friendsList.setFont(new Font("Arial", Font.BOLD, 16));
 
     layoutConstraints.weightx = 1;
     layoutConstraints.weighty = 1;
     layoutConstraints.fill = GridBagConstraints.BOTH;
-    friendsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    friendsList.setLayoutOrientation(JList.VERTICAL);
-
-    setListOfFriends(friends);
-    redisplayListOfFriends();
-
     layoutConstraints.gridx = 0;
-    layoutConstraints.gridy = 3;
-    friendsList.setFont(new Font("Arial", Font.BOLD, 16));
+    layoutConstraints.gridy = 2;
     friendsScrollPane = new JScrollPane(friendsList);
     this.add(friendsScrollPane, layoutConstraints);
 
@@ -93,7 +96,7 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     layoutConstraints.weighty = 0;
     layoutConstraints.gridwidth = 1;
     layoutConstraints.gridx = 0;
-    layoutConstraints.gridy = 4;
+    layoutConstraints.gridy = 3;
     layoutConstraints.fill = GridBagConstraints.NONE;
     ImageIcon image = new ImageIcon(FRIENDS_VISIBILITY_BUTTON_ICON);
     changeOnlineFriendsViewButton.setPreferredSize(new Dimension(21, 19));
@@ -109,7 +112,7 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     this.add(changeOnlineFriendsViewButton, layoutConstraints);
 
     layoutConstraints.gridx = 1;
-    layoutConstraints.gridy = 4;
+    layoutConstraints.gridy = 3;
     image = new ImageIcon(SEARCH_ICON);
     searchLogo.setIcon(image);
     searchLogo.setPreferredSize(new Dimension(25, 19));
@@ -117,7 +120,7 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
 
     layoutConstraints.gridwidth = 2;
     layoutConstraints.gridx = 2;
-    layoutConstraints.gridy = 4;
+    layoutConstraints.gridy = 3;
     layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
     this.add(searchTextField, layoutConstraints);
 
@@ -140,8 +143,16 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     return null;
   }
 
+  public void addAddFriendButtonActionListener(ActionListener actionListener) {
+    addFriendItem.addActionListener(actionListener);
+  }
+
   public void addLogoutButtonActionListener(ActionListener actionListener) {
     logOutMenuItem.addActionListener(actionListener);
+  }
+
+  public void addExitButtonActionListener(ActionListener actionListener) {
+    exitItem.addActionListener(actionListener);
   }
 
   public void addFriendsListMouseListener(MouseListener mouseListener) {
@@ -158,6 +169,12 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     redisplayListOfFriends();
   }
 
+  @Override
+  public void newFriendAdded(Friend friend) {
+    friendsListModel.addElement(friend);
+    redisplayListOfFriends();
+  }
+
   private void redisplayListOfFriends() {
     friendsList.setModel(getFriendsToDisplay());
   }
@@ -165,9 +182,11 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
   private DefaultListModel<String> getFriendsToDisplay() {
     if (searchTextField.getText().isEmpty()) {
       if (showOnlineFriends) {
+        onlineFriendsLabel.setText(ONLINE_FRIENDS);
         return friendsListModel.getOnlineFriendsNames();
       }
       else {
+        onlineFriendsLabel.setText(ALL_FRIENDS);
         return friendsListModel.getAllFriendsNames();
       }
     }

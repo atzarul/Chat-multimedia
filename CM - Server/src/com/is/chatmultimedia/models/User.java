@@ -33,4 +33,12 @@ public class User implements Serializable {
     return friends.get(username);
   }
 
+  public void addFriend(Friend friend) {
+    friends.put(friend.getUsername(), friend);
+  }
+
+  public void removeFriendByUsername(String username) {
+    friends.remove(username);
+  }
+
 }

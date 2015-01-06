@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,7 +31,7 @@ public class ConversationWindow extends JFrame {
     this.addWindowListener(new WindowClosing());
     this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     this.setTitle(tabbedPanel.getTitleAt(tabbedPanel.getSelectedIndex()));
-    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     this.setLocationRelativeTo(null);
     this.setVisible(true);
   }
@@ -54,6 +53,12 @@ public class ConversationWindow extends JFrame {
 
     public void conversationWindowClosed();
 
+  }
+  
+  private void closeWindow() {
+    this.setVisible(false);
+    this.dispose();
+    conversationListener.conversationWindowClosed();
   }
 
   private class TabPanel extends JPanel {
@@ -112,12 +117,6 @@ public class ConversationWindow extends JFrame {
       this.add(closeButton, constraints);
     }
 
-  }
-
-  private void closeWindow() {
-    this.setVisible(false);
-    this.dispose();
-    conversationListener.conversationWindowClosed();
   }
 
   private class WindowClosing extends WindowAdapter {

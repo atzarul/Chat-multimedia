@@ -94,6 +94,9 @@ public class ConversationPanel extends JPanel {
     layoutConstraints.fill = GridBagConstraints.NONE;
     this.add(sendButton, layoutConstraints);
 
+    this.setVisible(true);
+    inputArea.requestFocusInWindow();
+
     dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
   }
 

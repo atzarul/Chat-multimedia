@@ -9,6 +9,8 @@ import java.util.List;
 
 import com.is.chatmultimedia.models.ClientMessage;
 import com.is.chatmultimedia.models.Friend;
+import com.is.chatmultimedia.models.FriendRequest;
+import com.is.chatmultimedia.models.FriendRequestMessage;
 import com.is.chatmultimedia.models.LoginMessage;
 import com.is.chatmultimedia.models.LoginResponseMessage;
 import com.is.chatmultimedia.models.LogoutMessage;
@@ -54,6 +56,7 @@ public class AuthenticationService {
   }
 
   private boolean login(LoginMessage loginMessage, Connection userConnection) {
+    boolean successful = false;
     LoginResponseMessage responseMessage;
     try {
       UserRecord userRecord = databaseOperations.getUserRecord(loginMessage.getUsername());
@@ -77,10 +80,19 @@ public class AuthenticationService {
           // TEST MESSAGE
           System.out.println("User - " + user.getUsername() + " - logged in! Logged in users ("
               + userManager.getNumberOfUsers() + "): " + userManager.getListOfUsers());
+          successful = true;
         }
       }
       // write response to user
       writeResponse(responseMessage, userConnection);
+      if (successful) { // send new logged in user any pending friend requests
+        List<FriendRequest> requests = databaseOperations.getAllFriendRequestsForUser(loginMessage.getUsername());
+        FriendRequestMessage request;
+        for (FriendRequest it : requests) {
+          request = new FriendRequestMessage(it);
+          writeResponse(request, userConnection);
+        }
+      }
       return true;
     }
     catch (SQLException e) {

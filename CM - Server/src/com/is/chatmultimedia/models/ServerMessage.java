@@ -7,7 +7,7 @@ public abstract class ServerMessage implements Serializable {
   private static final long serialVersionUID = 1;
 
   public enum ServerMessageType {
-    REGISTER, LOGIN, LOGOUT, CONVERSATION, CLOSE_CONNECTION
+    REGISTER, LOGIN, LOGOUT, CONVERSATION, ADD_FRIEND, DELETE_FRIEND, FRIEND_REQUEST_RESPONSE, CLOSE_CONNECTION
   }
 
   private ServerMessageType messageType;

@@ -9,13 +9,20 @@ import java.net.SocketException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import com.is.chatmultimedia.models.AddFriendMessage;
+import com.is.chatmultimedia.models.AddFriendResponseMessage;
 import com.is.chatmultimedia.models.ClientConversationMessage;
 import com.is.chatmultimedia.models.ClientMessage;
 import com.is.chatmultimedia.models.CloseConnectionMessage;
+import com.is.chatmultimedia.models.DeleteFriendMessage;
 import com.is.chatmultimedia.models.Friend;
+import com.is.chatmultimedia.models.FriendRequest;
+import com.is.chatmultimedia.models.FriendRequestMessage;
+import com.is.chatmultimedia.models.FriendRequestResponseMessage;
 import com.is.chatmultimedia.models.LoginMessage;
 import com.is.chatmultimedia.models.LoginResponseMessage;
 import com.is.chatmultimedia.models.LogoutMessage;
+import com.is.chatmultimedia.models.NewFriendMessage;
 import com.is.chatmultimedia.models.RegisterMessage;
 import com.is.chatmultimedia.models.RegisterResponseMessage;
 import com.is.chatmultimedia.models.ServerConversationMessage;
@@ -40,8 +47,9 @@ public class Client {
   private RegisterListener registerListener;
   private FriendsManagerListener friendsManagerListener;
   private ServerMessageListener serverMessageListener;
+  private FriendRequestListener friendRequestListener;
 
-  private static final String HOST_NAME = "188.24.101.175";
+  private static final String HOST_NAME = "192.168.43.168";
   private static final int HOST_PORT = 8888;
 
   public Client() {
@@ -94,6 +102,10 @@ public class Client {
     this.serverMessageListener = serverMessageListener;
   }
 
+  public void registerFriendRequestListener(FriendRequestListener friendRequestListener) {
+    this.friendRequestListener = friendRequestListener;
+  }
+
   public boolean isUserAuthorized() {
     return this.isAuthorized;
   }
@@ -135,6 +147,33 @@ public class Client {
     if (!isAuthorized) {
       RegisterMessage registerMessage = new RegisterMessage(username, password, name);
       sendMessageToServer(registerMessage);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean addFriend(String username) {
+    if (isAuthorized) {
+      AddFriendMessage message = new AddFriendMessage(loggedInUser.getUsername(), loggedInUser.getName(), username);
+      sendMessageToServer(message);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean deleteFriend(String username) {
+    if (isAuthorized) {
+      DeleteFriendMessage message = new DeleteFriendMessage(loggedInUser.getUsername(), username);
+      sendMessageToServer(message);
+      return true;
+    }
+    return false;
+  }
+
+  public boolean respondToFriendRequest(boolean accepted, FriendRequest friendRequest) {
+    if (isAuthorized) {
+      FriendRequestResponseMessage message = new FriendRequestResponseMessage(accepted, friendRequest);
+      sendMessageToServer(message);
       return true;
     }
     return false;
@@ -228,6 +267,30 @@ public class Client {
         Friend friend = loggedInUser.getFriendByUsername(userWentOfflineMessage.getUsername());
         friend.setIsOnline(false);
         friendsManagerListener.userWentOffline(userWentOfflineMessage.getUsername());
+      }
+      break;
+    case FRIEND_REQUEST:
+      FriendRequestMessage friendRequestMessage = (FriendRequestMessage) message;
+      if (friendRequestListener != null) {
+        friendRequestListener.newFriendRequest(friendRequestMessage.getFriendRequst());
+      }
+      break;
+    case ADD_FRIEND_RESPONSE:
+      AddFriendResponseMessage addFriendResponse = (AddFriendResponseMessage) message;
+      if (friendRequestListener != null) {
+        if (addFriendResponse.isSuccessful()) {
+          friendRequestListener.requestSentSuccessful(addFriendResponse.getMessage());
+        }
+        else {
+          friendRequestListener.requestSentFailed(addFriendResponse.getMessage());
+        }
+      }
+      break;
+    case NEW_FRIEND:
+      NewFriendMessage newFriendMessage = (NewFriendMessage) message;
+      loggedInUser.addFriend(newFriendMessage.getFriend());
+      if (friendsManagerListener != null) {
+        friendsManagerListener.newFriendAdded(newFriendMessage.getFriend());
       }
       break;
     case SERVER_STOPPED:

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -15,6 +13,7 @@ import com.is.chatmultimedia.models.ServerStoppedMessage;
 import com.is.chatmultimedia.server.models.Connection;
 import com.is.chatmultimedia.server.services.AuthenticationService;
 import com.is.chatmultimedia.server.services.ConversationService;
+import com.is.chatmultimedia.server.services.FriendsService;
 import com.is.chatmultimedia.server.services.RegisterService;
 
 public class Server {
@@ -28,6 +27,7 @@ public class Server {
   private AuthenticationService authenticationService;
   private ConversationService conversationService;
   private RegisterService registerService;
+  private FriendsService friendsService;
 
   private static Server instance;
   private static final int PORT = 8888;
@@ -49,6 +49,7 @@ public class Server {
     authenticationService = AuthenticationService.getInstance();
     conversationService = ConversationService.getInstance();
     registerService = RegisterService.getInstance();
+    friendsService = FriendsService.getInstance();
   }
 
   /**
@@ -121,6 +122,10 @@ public class Server {
       return authenticationService.serveRequest(message, sourceConnection);
     case CONVERSATION:
       return conversationService.serveRequest(message);
+    case ADD_FRIEND:
+    case DELETE_FRIEND:
+    case FRIEND_REQUEST_RESPONSE:
+      return friendsService.serverRequest(message, sourceConnection);
     case CLOSE_CONNECTION:
       return removeConnecion(sourceConnection);
     }

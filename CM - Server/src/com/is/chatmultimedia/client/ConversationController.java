@@ -21,16 +21,18 @@ public class ConversationController implements MessageListener, ConversationPane
   }
 
   public void openConversationWindowFor(String username, String name) {
-    ConversationPanel panel = new ConversationPanel(username);
-    panel.registerMessageListener(this);
-    if (conversationWindow == null) {
-      conversationWindow = new ConversationWindow(name, panel);
-      conversationWindow.registerConversationListener(this);
+    if (conversations.get(username) == null) {
+      ConversationPanel panel = new ConversationPanel(username);
+      panel.registerMessageListener(this);
+      if (conversationWindow == null) {
+        conversationWindow = new ConversationWindow(name, panel);
+        conversationWindow.registerConversationListener(this);
+      }
+      else {
+        conversationWindow.addConversationPanel(name, panel);
+      }
+      conversations.put(username, panel);
     }
-    else {
-      conversationWindow.addConversationPanel(name, panel);
-    }
-    conversations.put(username, panel);
   }
 
   public void closeAllConversations() {
