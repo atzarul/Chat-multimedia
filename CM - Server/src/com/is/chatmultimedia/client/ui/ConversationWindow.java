@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,11 +24,14 @@ public class ConversationWindow extends JFrame {
   private static final int DEFAULT_HEIGHT = 300;
   private static final long serialVersionUID = 1;
 
+  private static final String APP_ICON_16 = "resources//chat logo 16x16.png";
+  
   public ConversationWindow(String title, ConversationPanel firstPanel) {
     tabbedPanel = new JTabbedPane();
     addConversationPanel(title, firstPanel);
 
     this.setContentPane(tabbedPanel);
+    this.setIconImage(new ImageIcon(APP_ICON_16).getImage());
     this.addWindowListener(new WindowClosing());
     this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     this.setTitle(tabbedPanel.getTitleAt(tabbedPanel.getSelectedIndex()));
@@ -41,6 +45,10 @@ public class ConversationWindow extends JFrame {
     tabbedPanel.setSelectedIndex(tabbedPanel.getTabCount() - 1);
     tabbedPanel.setTabComponentAt(tabbedPanel.getSelectedIndex(), new TabPanel(this, tabbedPanel, title, panel));
     this.setTitle(title);
+  }
+  
+  public void setSelectedTab(ConversationPanel panel) {
+    tabbedPanel.setSelectedComponent(panel);
   }
 
   public void registerConversationListener(ConversationsListener conversationsListener) {

@@ -21,8 +21,9 @@ public class ConversationController implements MessageListener, ConversationPane
   }
 
   public void openConversationWindowFor(String username, String name) {
-    if (conversations.get(username) == null) {
-      ConversationPanel panel = new ConversationPanel(username);
+    ConversationPanel panel = conversations.get(username);
+    if (panel == null) {
+      panel = new ConversationPanel(username);
       panel.registerMessageListener(this);
       if (conversationWindow == null) {
         conversationWindow = new ConversationWindow(name, panel);
@@ -33,6 +34,7 @@ public class ConversationController implements MessageListener, ConversationPane
       }
       conversations.put(username, panel);
     }
+    conversationWindow.setSelectedTab(panel);
   }
 
   public void closeAllConversations() {

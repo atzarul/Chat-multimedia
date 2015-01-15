@@ -1,6 +1,7 @@
 package com.is.chatmultimedia.client;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -8,7 +9,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,9 +34,14 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
 
   private static final String WINDOW_TITLE = "MultiChat";
   private static final String SERVER_CONNECTION_ERROR = "Cannot establish connection to server!";
-  private static final String FIELDS_EMPTY = "Some fields are empty!";
-  private static final String ALREADY_FRIENDS = "Already friends!";
+  private static final String FIELDS_EMPTY = "Some fields are empty!         ";
+  private static final String ALREADY_FRIENDS = "Already friends!           ";
   private static final String NEW_FRIEND_REQUST = " wants to be friends with you. Accept?";
+  private static final String CANT_ADD_YOURSELF = "Can't add yourself!               ";
+  
+  private static final String APP_ICON_16 = "resources//chat logo 16x16.png";
+  private static final String APP_ICON_64 = "resources//chat logo 64x64.png";
+  private static final String APP_ICON_128 = "resources//chat logo 128x128.png";
 
   public ClientController(Client client) {
     this.client = client;
@@ -55,6 +63,11 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
     loginPanel.addLoginButtonActionListener(new LoginButtonAction());
     mainWindow = new JFrame();
     mainWindow.addWindowListener(new ClientClosing());
+    ArrayList<Image> icons = new ArrayList<>();
+    icons.add(new ImageIcon(APP_ICON_16).getImage());
+    icons.add(new ImageIcon(APP_ICON_64).getImage());
+    icons.add(new ImageIcon(APP_ICON_128).getImage());
+    mainWindow.setIconImages(icons);
     mainWindow.setContentPane(loginPanel);
     mainWindow.setSize(new Dimension(275, 450));
     mainWindow.setLocation(1050, 170);
@@ -204,6 +217,10 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
         String newFriend = panel.getText();
         if (newFriend.trim().isEmpty()) {
           showErrorMessage(FIELDS_EMPTY);
+          continue;
+        }
+        if(newFriend.compareTo(client.getLoggedInUser().getUsername()) == 0) {
+          showErrorMessage(CANT_ADD_YOURSELF);
           continue;
         }
         if (client.getLoggedInUser().getFriendByUsername(newFriend) != null) {

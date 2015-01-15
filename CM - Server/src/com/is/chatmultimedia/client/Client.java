@@ -49,7 +49,7 @@ public class Client {
   private ServerMessageListener serverMessageListener;
   private FriendRequestListener friendRequestListener;
 
-  private static final String HOST_NAME = "192.168.43.168";
+  private static final String HOST_NAME = "localhost";
   private static final int HOST_PORT = 8888;
 
   public Client() {
