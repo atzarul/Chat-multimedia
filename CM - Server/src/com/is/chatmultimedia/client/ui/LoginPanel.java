@@ -1,12 +1,17 @@
 package com.is.chatmultimedia.client.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -27,6 +32,8 @@ public class LoginPanel extends JPanel {
   private JLabel passwordLabel = new JLabel("Password");
   private JPasswordField passwordTextFields = new JPasswordField(10);
   private JButton loginButton = new JButton("Login");
+  
+  private JLabel registerLabel = new JLabel("Register");
   
   private static final String LOGO = "resources//chat logo 128x128.png";
 
@@ -75,7 +82,16 @@ public class LoginPanel extends JPanel {
     layoutConstraints.gridwidth = 2;
     layoutConstraints.gridx = 0;
     layoutConstraints.gridy = 5;
-    this.add(Box.createRigidArea(new Dimension(0, 120)), layoutConstraints);
+    this.add(Box.createRigidArea(new Dimension(0, 80)), layoutConstraints);
+    
+    layoutConstraints.gridx = 0;
+    layoutConstraints.gridy = 6;
+    registerLabel.setForeground(new Color(37, 74, 158));
+    Font font = registerLabel.getFont();
+    Map attributes = font.getAttributes(); 
+    attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+    registerLabel.setFont(font.deriveFont(attributes));
+    this.add(registerLabel,layoutConstraints);
   }
 
   public String getUsername() {
@@ -96,6 +112,10 @@ public class LoginPanel extends JPanel {
 
   public void addLoginButtonActionListener(ActionListener actionListener) {
     loginButton.addActionListener(actionListener);
+  }
+  
+  public void addRegisterLabelMouseListener(MouseListener l){
+	  registerLabel.addMouseListener(l);
   }
 
   private class EnterKeyListener extends KeyAdapter {

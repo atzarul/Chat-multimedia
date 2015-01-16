@@ -1,9 +1,9 @@
 package com.is.chatmultimedia.client.ui.models;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Comparator;
 
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
@@ -12,7 +12,7 @@ import com.is.chatmultimedia.models.Friend;
 
 public class FriendsListModel extends AbstractListModel<String> {
 
-  private LinkedList<Friend> friendsList;
+  private ArrayList<Friend> friendsList;
   private static String BULLET = "   \u2022  ";
   private static final long serialVersionUID = 1;
 
@@ -33,30 +33,31 @@ public class FriendsListModel extends AbstractListModel<String> {
     return friendsList.size();
   }
 
-  public Friend getFriendAt(int index) {
+  public Friend getFriendAt(int index, boolean fromOnline) {
     if (index < friendsList.size()) {
-      return friendsList.get(index);
+    	if(!fromOnline)
+    		return friendsList.get(index);
+    	else{
+    		int iterator = -1;
+    		for(Friend friend: friendsList){
+    			if(friend.isOnline())
+    				iterator ++;
+    			if(iterator == index)
+    				return friend;
+    		}
+    	}
     }
     return null;
   }
 
   public void addElement(Friend friend) {
-    Friend temp;
-    Iterator<Friend> it = friendsList.iterator();
-    int insertPosition = 0;
-    while (it.hasNext()) {
-      temp = it.next();
-      if (temp.getName().compareTo(friend.getName()) > 0) {
-        break;
-      }
-      ++insertPosition;
-    }
-    friendsList.add(insertPosition, friend);
+	  friendsList.add(friend);
+	  Collections.sort(this.friendsList,new FriendsComparator());
   }
 
   public void setFriendsList(Collection<Friend> friendsList) {
-    this.friendsList = new LinkedList<Friend>(friendsList);
-    Collections.sort(this.friendsList);
+    this.friendsList = new ArrayList<Friend>(friendsList);
+    Collections.sort(this.friendsList, new FriendsComparator());
   }
 
   public DefaultListModel<String> getAllFriendsNames() {
@@ -85,23 +86,40 @@ public class FriendsListModel extends AbstractListModel<String> {
   }
 
   public DefaultListModel<String> selectOnlineFriendsFromList(String partOfName) {
-    LinkedList<Friend> selectedFriendsList = new LinkedList<Friend>();
+	String searchText = partOfName.toLowerCase();
+	DefaultListModel<String> selectedFriendsList = new DefaultListModel<String>();
     for (Friend friend : friendsList) {
-      if (friend.getName().contains(partOfName))
-        selectedFriendsList.add(friend);
+      if (friend.getName().toLowerCase().contains(searchText) && friend.isOnline())
+        selectedFriendsList.addElement(BULLET + friend.getName());
     }
-    this.friendsList = selectedFriendsList;
-    return null;
+    return selectedFriendsList;
   }
 
   public DefaultListModel<String> selectAllFriendsFromList(String partOfName) {
-    LinkedList<Friend> selectedFriendsList = new LinkedList<Friend>();
+	String searchText = partOfName.toLowerCase();
+	DefaultListModel<String> selectedFriendsList = new DefaultListModel<String>();
     for (Friend friend : friendsList) {
-      if (friend.getName().contains(partOfName) && friend.isOnline())
-        selectedFriendsList.add(friend);
+      if (friend.getName().toLowerCase().contains(searchText)){
+    	  if (friend.isOnline()) {
+    		  selectedFriendsList.addElement("<html><font color=green>&nbsp;&nbsp;&nbsp;" + BULLET + "&nbsp;" + friend.getName()
+    	            + "</font></html>");
+    	      }
+    	      else {
+    	    	  selectedFriendsList.addElement("<html><font color=gray>&nbsp;&nbsp;&nbsp;" + BULLET + "&nbsp;" + friend.getName()
+    	            + "</font></html>");
+    	      }
+      }
     }
-    this.friendsList = selectedFriendsList;
-    return null;
+    return selectedFriendsList;
+  }
+  
+  private class FriendsComparator implements Comparator<Friend>{
+
+	@Override
+	public int compare(Friend o1, Friend o2) {
+		return o1.getName().compareTo(o2.getName());
+	}
+	  
   }
 
 }

@@ -10,6 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -19,17 +21,19 @@ import javax.swing.JOptionPane;
 import com.is.chatmultimedia.client.ui.AddFriendPanel;
 import com.is.chatmultimedia.client.ui.FriendsPanel;
 import com.is.chatmultimedia.client.ui.LoginPanel;
+import com.is.chatmultimedia.client.ui.RegisterPanel;
 import com.is.chatmultimedia.models.Friend;
 import com.is.chatmultimedia.models.FriendRequest;
 import com.is.chatmultimedia.models.User;
 
-public class ClientController implements AuthenticationListener, FriendRequestListener {
+public class ClientController implements AuthenticationListener, FriendRequestListener, RegisterListener {
 
   private Client client;
 
   private JFrame mainWindow;
   private LoginPanel loginPanel;
   private FriendsPanel friendsPanel;
+  private RegisterPanel registerPanel;
   private ConversationController conversationController;
 
   private static final String WINDOW_TITLE = "MultiChat";
@@ -38,6 +42,10 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
   private static final String ALREADY_FRIENDS = "Already friends!           ";
   private static final String NEW_FRIEND_REQUST = " wants to be friends with you. Accept?";
   private static final String CANT_ADD_YOURSELF = "Can't add yourself!               ";
+  private static final String PASSWORD_CONFIRMATION_NOT_MATCH = "Password confirmation doesn't match!              ";
+  private static final String ILLEGAL_CHARACTERS = "There are illegal characters!              ";
+  
+  private static final String PATTERN = "^[a-zA-Z0-9_.]*$";
   
   private static final String APP_ICON_16 = "resources//chat logo 16x16.png";
   private static final String APP_ICON_64 = "resources//chat logo 64x64.png";
@@ -57,11 +65,16 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
 
     client.registerAuthenticationListener(this);
     client.registerFriendRequestListener(this);
+    client.registerRegisterListener(this);
     conversationController = new ConversationController(client);
 
     loginPanel = new LoginPanel();
     loginPanel.addLoginButtonActionListener(new LoginButtonAction());
+    loginPanel.addRegisterLabelMouseListener(new RegisterClicked());
     mainWindow = new JFrame();
+    registerPanel = new RegisterPanel();
+    registerPanel.addRegisterButtonListener(new RegisterDone());
+    registerPanel.addCancelButtonListener(new CancelRegister());
     mainWindow.addWindowListener(new ClientClosing());
     ArrayList<Image> icons = new ArrayList<>();
     icons.add(new ImageIcon(APP_ICON_16).getImage());
@@ -238,4 +251,67 @@ public class ClientController implements AuthenticationListener, FriendRequestLi
     ClientController clientController = new ClientController(client);
   }
 
+  private class RegisterClicked extends MouseAdapter{
+	  
+	  @Override
+	  public void mousePressed(MouseEvent e){
+		  mainWindow.setContentPane(registerPanel);
+		  mainWindow.revalidate();
+		  mainWindow.repaint();
+	  }
+  }
+  
+  private class RegisterDone extends MouseAdapter{
+	  
+	  @Override
+	  public void mousePressed(MouseEvent e){
+		  String name, username;
+		  char[] password, passwordConfirmation;
+		  name = registerPanel.getName();
+		  username = registerPanel.getUsername();
+		  password = registerPanel.getPassword();
+		  passwordConfirmation = registerPanel.getPasswordConfirmation();
+		  if(name.isEmpty() || username.isEmpty() || password.length == 0 || passwordConfirmation.length == 0)
+			  showErrorMessage(FIELDS_EMPTY);
+		  else
+			  if(!Arrays.equals(password,passwordConfirmation))
+				  showErrorMessage(PASSWORD_CONFIRMATION_NOT_MATCH);
+			  else{
+				  String stringPassword = registerPanel.getStringPassword();
+				  if(!name.matches(PATTERN) || !username.matches(PATTERN) || !stringPassword.matches(PATTERN))
+					  showErrorMessage(ILLEGAL_CHARACTERS);
+				  else
+					  client.register(username, stringPassword, name);
+			  }
+	  }
+  }
+
+	@Override
+	public void registerSuccesfull(String message) {
+		JOptionPane.showMessageDialog(mainWindow, new JLabel(message, JLabel.CENTER), "Registration successful",
+		        JOptionPane.PLAIN_MESSAGE);
+		
+		registerPanel.clearTextFields();
+		mainWindow.setContentPane(loginPanel);
+		mainWindow.revalidate();
+		mainWindow.repaint();
+		
+	}
+
+	@Override
+	public void registerFailed(String message) {
+		showErrorMessage(message);
+	}
+	
+
+	  private class CancelRegister extends MouseAdapter{
+		  
+		  @Override
+		  public void mousePressed(MouseEvent e){
+			  registerPanel.clearTextFields();
+			  mainWindow.setContentPane(loginPanel);
+			  mainWindow.revalidate();
+			  mainWindow.repaint();
+		  }
+	  }
 }

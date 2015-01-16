@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -118,6 +120,7 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
     searchLogo.setPreferredSize(new Dimension(25, 19));
     this.add(searchLogo, layoutConstraints);
 
+    searchTextField.addKeyListener(new SearchFriendKeyListener());
     layoutConstraints.gridwidth = 2;
     layoutConstraints.gridx = 2;
     layoutConstraints.gridy = 3;
@@ -138,7 +141,7 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
 
   public Friend getSelectedFriend() {
     if (friendsListModel != null) {
-      return friendsListModel.getFriendAt(friendsList.getSelectedIndex());
+      return friendsListModel.getFriendAt(friendsList.getSelectedIndex(),showOnlineFriends);
     }
     return null;
   }
@@ -180,7 +183,8 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
   }
 
   private DefaultListModel<String> getFriendsToDisplay() {
-    if (searchTextField.getText().isEmpty()) {
+	  String searchText = searchTextField.getText().trim();
+    if (searchText.isEmpty()) {
       if (showOnlineFriends) {
         onlineFriendsLabel.setText(ONLINE_FRIENDS);
         return friendsListModel.getOnlineFriendsNames();
@@ -190,7 +194,21 @@ public class FriendsPanel extends JPanel implements FriendsManagerListener {
         return friendsListModel.getAllFriendsNames();
       }
     }
-    return null;
+    else{
+    	if(showOnlineFriends){
+    		return friendsListModel.selectOnlineFriendsFromList(searchText);
+    	}
+    	else{
+    		return friendsListModel.selectAllFriendsFromList(searchText);
+    	}
+    }
   }
 
+  private class SearchFriendKeyListener extends KeyAdapter{
+	  
+	  @Override
+	  public void keyReleased(KeyEvent e) {
+	    redisplayListOfFriends();
+	  }
+  }
 }
